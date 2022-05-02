@@ -1,4 +1,5 @@
 import { Token, Tokenizer, TokenType } from './tokenizer';
+import { isAssignmentOperator, isLiteral } from './parser-token.helpers';
 
 export class Parser {
   private tokenizer = new Tokenizer();
@@ -71,7 +72,22 @@ export class Parser {
   }
 
   Expression() {
-    return this.AdditiveExpression();
+    return this.AssignmentExpression();
+  }
+
+  AssignmentExpression() {
+    let left = this.AdditiveExpression();
+
+    if (isAssignmentOperator(this.lookahead!.type)) {
+      return {
+        type: 'AssignmentExpression',
+        operator: this.AssignmentOperator().value,
+        left: this.checkValidAssignmentTarget(left),
+        right: this.AssignmentExpression(),
+      };
+    }
+
+    return left;
   }
 
   BinaryExpression(builderName: string, operatorToken: TokenType) {
@@ -92,6 +108,10 @@ export class Parser {
     return leftOperand;
   }
 
+  LeftHandSideExpression() {
+    return this.Identifier();
+  }
+
   AdditiveExpression() {
     return this.BinaryExpression(
       'MultiplicativeExpression',
@@ -107,11 +127,14 @@ export class Parser {
   }
 
   PrimaryExpression() {
+    if (isLiteral(this.lookahead!.type)) {
+      return this.Literal();
+    }
     switch (this.lookahead?.type) {
       case TokenType.OpenBracket:
         return this.ParanthesizedExpression();
       default:
-        return this.Literal();
+        return this.LeftHandSideExpression();
     }
   }
 
@@ -154,7 +177,7 @@ export class Parser {
     }
 
     if (token.type !== tokenType) {
-      throw new Error(`Unexpected token: "${token.type}, expected: ${tokenType}"`);
+      throw new Error(`Unexpected token: "${token.type}", expected: ${tokenType}"`);
     }
 
     this.lookahead = this.tokenizer.getNextToken();
@@ -193,7 +216,7 @@ export class Parser {
 
   VariableDeclarator() {
     const identifier = this.Identifier();
-    this.eat(TokenType.Assignment);
+    this.eat(TokenType.SimpleAssignment);
     const expression = this.Expression();
 
     return {
@@ -202,12 +225,26 @@ export class Parser {
       init: expression,
     };
   }
+
+  private AssignmentOperator() {
+    if (this.lookahead?.type === TokenType.SimpleAssignment) {
+      return this.eat(TokenType.SimpleAssignment);
+    }
+
+    return this.eat(TokenType.ComplexAssignment);
+  }
+
+  private checkValidAssignmentTarget(target) {
+    if (target.type === TokenType.Identifier) {
+      return target;
+    }
+
+    throw new Error(`Invalid left hand side expression, expected identifier, got: "${target.type}"`);
+  }
 }
 
 const program = `
- a = (2 / 2),
-     b = 5,
-     c = (2 + 2) / 3 * 15;
+var x = y = 3;
   `;
 
 const parser = new Parser();
@@ -224,3 +261,24 @@ console.log(JSON.stringify(parser.parse(program), null, 2));
 // }
 //
 // console.log(tokens);
+
+/**
+ * graph TD
+ *     Statement --> BlockStatement
+ *     Statement --> EmptyStatement
+ *     Statement --> VariableDeclaration
+ *     Statement --> ExpressionStatement
+ *     ExpressionStatement --> Expression
+ *     BlockStatement --> Statement
+ *     VariableDeclaration --> VariableDeclarator
+ *     VariableDeclarator --> Identifier
+ *     VariableDeclarator --> Expression
+ *     Expression --> AssignmentExpression
+ *     AssignmentExpression --> BinaryExpression
+ *     BinaryExpression --> MultiplicativeExpression
+ *     BinaryExpression --> PrimaryExpression
+ *     PrimaryExpression --> Literal
+ *     PrimaryExpression --> ParanthesizedExpression
+ *     PrimaryExpression --> LeftHandSideExpression
+ *     LeftHandSideExpression --> Identifier
+ */

@@ -10,7 +10,8 @@ export enum TokenType {
   AdditiveOperator = 'AdditiveOperator',
   MultiplicativeOperator = 'MultiplicativeOperator',
   VariableDeclaration = 'VariableDeclaration',
-  Assignment = 'Assignment',
+  SimpleAssignment = 'SimpleAssignment',
+  ComplexAssignment = 'ComplexAssignment',
   Identifier = 'Identifier',
   Comma = 'Comma',
 }
@@ -36,8 +37,10 @@ const TokenRules: [RegExp, TokenType | null][] = [
   [/^\(/, TokenType.OpenBracket],
   [/^\)/, TokenType.CloseBracket],
 
-  // Signs
-  [/^\=/, TokenType.Assignment],
+  // Assignment
+  [/^\=/, TokenType.SimpleAssignment],
+  [/^[\+\-\*\/]=/, TokenType.ComplexAssignment],
+
   [/^\,/, TokenType.Comma],
 
   // Variable
