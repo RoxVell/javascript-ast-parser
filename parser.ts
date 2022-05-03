@@ -76,7 +76,7 @@ export class Parser {
   }
 
   AssignmentExpression() {
-    let left = this.AdditiveExpression();
+    let left = this.RelationalExpression();
 
     if (isAssignmentOperator(this.lookahead!.type)) {
       return {
@@ -90,6 +90,20 @@ export class Parser {
     return left;
   }
 
+  RelationalExpression() {
+    return this.BinaryExpression(
+      'AdditiveExpression',
+      TokenType.RelationalOperator
+    );
+  }
+
+  AdditiveExpression() {
+    return this.BinaryExpression(
+      'MultiplicativeExpression',
+      TokenType.AdditiveOperator
+    );
+  }
+
   BinaryExpression(builderName: string, operatorToken: TokenType) {
     let leftOperand = this[builderName]();
 
@@ -98,7 +112,6 @@ export class Parser {
       const rightOperand = this[builderName]();
       leftOperand = {
         type: 'BinaryExpression',
-        // @ts-ignore
         operator,
         left: leftOperand,
         right: rightOperand,
@@ -110,13 +123,6 @@ export class Parser {
 
   LeftHandSideExpression() {
     return this.Identifier();
-  }
-
-  AdditiveExpression() {
-    return this.BinaryExpression(
-      'MultiplicativeExpression',
-      TokenType.AdditiveOperator
-    );
   }
 
   MultiplicativeExpression() {
@@ -280,7 +286,7 @@ export class Parser {
 }
 
 const program = `
-let foo = bar = 5;
+x + 5 >= 10;
   `;
 
 const parser = new Parser();

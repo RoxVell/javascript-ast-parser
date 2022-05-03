@@ -16,6 +16,7 @@ export enum TokenType {
   If = 'If',
   Else = 'Else',
   Boolean = 'Boolean',
+  RelationalOperator = 'RelationalOperator',
 }
 
 const TokenRules: [RegExp, TokenType | null][] = [
@@ -56,6 +57,7 @@ const TokenRules: [RegExp, TokenType | null][] = [
   // Operators
   [/^[\+|\-]/, TokenType.AdditiveOperator],
   [/^[\*|\/]/, TokenType.MultiplicativeOperator],
+  [/^(>|<)?=/, TokenType.RelationalOperator],
 
   // Condition
   [/^if/, TokenType.If],
