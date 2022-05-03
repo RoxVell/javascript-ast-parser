@@ -10,6 +10,7 @@ export function isAssignmentOperator(tokenType: TokenType): boolean {
 export function isLiteral(tokenType: TokenType) {
   return [
     TokenType.String,
-    TokenType.Number
+    TokenType.Number,
+    TokenType.Boolean,
   ].includes(tokenType);
 }

@@ -4,7 +4,6 @@ export enum TokenType {
   Semicolon = 'Semicolon',
   OpenBlock = 'OpenBlock',
   CloseBlock = 'CloseBlock',
-  If = 'If',
   OpenBracket = 'OpenBracket',
   CloseBracket = 'CloseBracket',
   AdditiveOperator = 'AdditiveOperator',
@@ -14,19 +13,27 @@ export enum TokenType {
   ComplexAssignment = 'ComplexAssignment',
   Identifier = 'Identifier',
   Comma = 'Comma',
+  If = 'If',
+  Else = 'Else',
+  Boolean = 'Boolean',
 }
 
 const TokenRules: [RegExp, TokenType | null][] = [
+  /** Literals */
   // Number
   [/^\d+/, TokenType.Number],
+
+  // String
+  [/^"[^"]*"/, TokenType.String],
+  [/^'[^']*'/, TokenType.String],
+
+  // Boolean
+  [/^true|false/, TokenType.Boolean],
 
   // Comments
   [/^\/\/.*/, null],
   [/^\/\*[\s\S]*?\*\//, null],
 
-  // String
-  [/^"[^"]*"/, TokenType.String],
-  [/^'[^']*'/, TokenType.String],
   [/^;/, TokenType.Semicolon],
 
   // Block
@@ -44,7 +51,7 @@ const TokenRules: [RegExp, TokenType | null][] = [
   [/^\,/, TokenType.Comma],
 
   // Variable
-  [/^(var|let|const)/, TokenType.VariableDeclaration],
+  [/^\b(var|let|const)\b/, TokenType.VariableDeclaration],
 
   // Operators
   [/^[\+|\-]/, TokenType.AdditiveOperator],
@@ -52,6 +59,7 @@ const TokenRules: [RegExp, TokenType | null][] = [
 
   // Condition
   [/^if/, TokenType.If],
+  [/^else/, TokenType.Else],
 
   /** Skip tokens */
   // Whitespaces
@@ -92,13 +100,13 @@ export class Tokenizer {
         continue;
       }
 
-      console.log({
-        str: strToProcessed,
-        cursor: this.cursor,
-        regexp,
-        tokenType,
-        match
-      });
+      // console.log({
+      //   str: strToProcessed,
+      //   cursor: this.cursor,
+      //   regexp,
+      //   tokenType,
+      //   match
+      // });
 
       if (tokenType === null) {
         return this.getNextToken();

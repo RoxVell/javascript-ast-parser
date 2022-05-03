@@ -33,8 +33,8 @@ export class Parser {
         return this.EmptyStatement()
       case TokenType.VariableDeclaration:
         return this.VariableDeclaration();
-      // case TokenType.If:
-      //   return this.IfStatement()
+      case TokenType.If:
+        return this.IfStatement()
       default:
         return this.ExpressionStatement();
     }
@@ -149,6 +149,7 @@ export class Parser {
     switch (this.lookahead?.type) {
       case TokenType.Number: return this.NumericLiteral()
       case TokenType.String: return this.StringLiteral()
+      case TokenType.Boolean: return this.BooleanLiteral()
     }
     throw new Error(`Literal for type "${this.lookahead?.type}" not found`);
   }
@@ -188,6 +189,7 @@ export class Parser {
   VariableDeclaration() {
     const declarationKind = this.eat(TokenType.VariableDeclaration).value;
     const declarations = this.VariableDeclarators();
+    this.eat(TokenType.Semicolon);
     return {
       type: 'VariableDeclaration',
       declarations: declarations,
@@ -206,23 +208,27 @@ export class Parser {
     return declarations;
   }
 
+  VariableDeclarator() {
+    const identifier = this.Identifier();
+    let init = null;
+
+    if (this.lookahead?.type === TokenType.SimpleAssignment) {
+      this.eat(TokenType.SimpleAssignment);
+      init = this.AssignmentExpression();
+    }
+
+    return {
+      type: 'VariableDeclarator',
+      id: identifier,
+      init: init,
+    };
+  }
+
   Identifier() {
     const identifier = this.eat(TokenType.Identifier).value;
     return {
       type: 'Identifier',
       name: identifier,
-    };
-  }
-
-  VariableDeclarator() {
-    const identifier = this.Identifier();
-    this.eat(TokenType.SimpleAssignment);
-    const expression = this.Expression();
-
-    return {
-      type: 'VariableDeclarator',
-      id: identifier,
-      init: expression,
     };
   }
 
@@ -241,10 +247,40 @@ export class Parser {
 
     throw new Error(`Invalid left hand side expression, expected identifier, got: "${target.type}"`);
   }
+
+  private IfStatement() {
+    this.eat(TokenType.If);
+
+    const conditionExpression = this.Expression();
+    const statement = this.Statement();
+
+    let alternate = null;
+
+    if (this.lookahead?.type === TokenType.Else) {
+      this.eat(TokenType.Else);
+      alternate = this.Statement();
+    }
+
+    return {
+      type: 'IfStatement',
+      test: conditionExpression,
+      consequent: statement,
+      alternate: alternate,
+    };
+  }
+
+  private BooleanLiteral() {
+    const token = this.eat(TokenType.Boolean);
+    console.log(token);
+    return {
+      type: 'BooleanLiteral',
+      value: Boolean(token.value),
+    };
+  }
 }
 
 const program = `
-var x = y = 3;
+let foo = bar = 5;
   `;
 
 const parser = new Parser();
