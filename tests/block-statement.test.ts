@@ -1,11 +1,4 @@
-import * as assert from 'assert';
-import { Parser } from '../parser';
-
-export function test(program: string, expectedResult: any) {
-  const parser = new Parser();
-  const result = parser.parse(program);
-  assert.deepStrictEqual(result, expectedResult);
-}
+import { test } from './variable-declaration.test';
 
 test('{}', {
   type: 'Program',
@@ -26,11 +19,11 @@ test('2 + 2;', {
         type: 'BinaryExpression',
         operator: '+',
         left: {
-          type: 'NumericLiteral',
+          type: 'NumberLiteral',
           value: 2,
         },
         right: {
-          type: 'NumericLiteral',
+          type: 'NumberLiteral',
           value: 2,
         },
       }
@@ -50,16 +43,16 @@ test('3 + 2 + 2;', {
           type: 'BinaryExpression',
           operator: '+',
           left: {
-            type: 'NumericLiteral',
+            type: 'NumberLiteral',
             value: 3,
           },
           right: {
-            type: 'NumericLiteral',
+            type: 'NumberLiteral',
             value: 2,
           },
         },
         right: {
-          type: 'NumericLiteral',
+          type: 'NumberLiteral',
           value: 2,
         },
       }
@@ -79,16 +72,16 @@ test('(1 + 2) * 3;', {
           type: 'BinaryExpression',
           operator: '+',
           left: {
-            type: 'NumericLiteral',
+            type: 'NumberLiteral',
             value: 1,
           },
           right: {
-            type: 'NumericLiteral',
+            type: 'NumberLiteral',
             value: 2,
           },
         },
         right: {
-          type: 'NumericLiteral',
+          type: 'NumberLiteral',
           value: 3,
         },
       }

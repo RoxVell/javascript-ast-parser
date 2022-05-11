@@ -1,4 +1,4 @@
-import { test } from '../block-statement';
+import { test } from '../variable-declaration.test';
 
 test(`true;`, {
   type: 'Program',
