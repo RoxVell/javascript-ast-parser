@@ -1,6 +1,6 @@
 import { Tokenizer } from './tokenizer';
 import { TokenType } from './tokens';
-import { isAssignmentOperator, isPrefixOperator, isUnaryOperator } from './tokens-utils';
+import { isAccessorOperator, isAssignmentOperator, isPrefixOperator, isUnaryOperator } from './tokens-utils';
 
 export class Parser {
   private tokenizer = new Tokenizer();
@@ -31,6 +31,8 @@ export class Parser {
     switch (this.lookahead.type) {
       case TokenType.Function:
         return this.FunctionDeclaration();
+      case TokenType.Class:
+        return this.ClassDeclaration();
       case TokenType.Async:
         return this.FunctionDeclaration();
       case TokenType.OpenBracket:
@@ -72,7 +74,7 @@ export class Parser {
    * LeftHandSideExpression AssignmentOperator AssignmentExpression
    */
   private AssignmentExpression() {
-    const left = this.LogicalOrExpression();
+    const left = this.ConditionalExpression();
 
     if (isAssignmentOperator(this.lookahead.type)) {
       const operator = this.AssignmentOperator().value;
@@ -82,6 +84,27 @@ export class Parser {
         operator,
         left: this.checkAssignmentTarget(left),
         right: this.AssignmentExpression(),
+      };
+    }
+
+    return left;
+  }
+
+  // Expression '?' Expression ':' Expression
+  ConditionalExpression() {
+    const left = this.LogicalOrExpression();
+
+    if (this.lookahead.type === TokenType.QuestionMark) {
+      this.expect(TokenType.QuestionMark);
+      const consequent = this.Expression();
+      this.expect(TokenType.Colon);
+      const alternate = this.Expression();
+
+      return {
+        type: 'ConditionalExpression',
+        test: left,
+        consequent,
+        alternate,
       };
     }
 
@@ -228,6 +251,7 @@ export class Parser {
       };
     }
 
+
     return left;
   }
 
@@ -235,6 +259,12 @@ export class Parser {
     switch (this.lookahead.type) {
       case TokenType.OpenParentheses:
         return this.ParenthesesExpression();
+      case TokenType.Class:
+        return this.ClassExpression();
+      case TokenType.OpenBracket:
+        return this.ObjectExpression();
+      case TokenType.Function:
+        return this.FunctionExpression();
       default:
         return this.CallExpression();
     }
@@ -305,20 +335,43 @@ export class Parser {
     return left;
   }
 
+  private ComputedProperty() {
+    if (this.lookahead.type === TokenType.OpenSquareBracket) {
+      return {
+        isComputed: true,
+        value: this.InsideSquareBrackets(this.Expression.bind(this))
+      };
+    }
+
+    return {
+      isComputed: false,
+      value: this.Identifier(),
+    };
+  }
+
+  private InsideSquareBrackets(expression) {
+    this.expect(TokenType.OpenSquareBracket);
+    const value = expression();
+    this.expect(TokenType.CloseSquareBracket);
+    return value;
+  }
+
+  private InsideParentheses(expression) {
+    this.expect(TokenType.OpenParentheses);
+    const value = expression();
+    this.expect(TokenType.CloseParentheses);
+    return value;
+  }
+
   // '(' Expression ')'
   ParenthesesExpression() {
-    this.expect(TokenType.OpenParentheses);
-    const expression = this.Expression();
-    this.expect(TokenType.CloseParentheses);
-    return expression;
+    return this.InsideParentheses(this.Expression.bind(this));
   }
 
   Literal() {
     switch (this.lookahead.type) {
       case TokenType.Null:
         return this.NullLiteral();
-      // case TokenType.Undefined:
-      //   return this.UndefinedLiteral();
       case TokenType.String:
         return this.StringLiteral();
       case TokenType.Number:
@@ -327,6 +380,8 @@ export class Parser {
         return this.BooleanLiteral();
       case TokenType.OpenSquareBracket:
         return this.ArrayExpression();
+      case TokenType.This:
+        return this.ThisExpression();
       case TokenType.Identifier:
         return this.Identifier();
     }
@@ -402,7 +457,7 @@ export class Parser {
 
     return {
       type: 'BooleanLiteral',
-      value: Boolean(token.value),
+      value: token.value === 'true',
     };
   }
 
@@ -416,6 +471,14 @@ export class Parser {
     this.lookahead = this.tokenizer.getNextToken();
 
     return currentToken;
+  }
+
+  expectOptional(tokenType: TokenType) {
+    if (this.lookahead.type === tokenType) {
+      return this.expect(tokenType);
+    }
+
+    return false;
   }
 
   private Identifier() {
@@ -524,6 +587,13 @@ export class Parser {
     return expression;
   }
 
+  private ExpressionInsideSquareBrackets() {
+    this.expect(TokenType.OpenSquareBracket);
+    const expression = this.Expression();
+    this.expect(TokenType.CloseSquareBracket);
+    return expression;
+  }
+
   // 'for' '(' Expression | null; Expression | null; Expression | null ')' BlockStatement
   ForStatement() {
     this.expect(TokenType.For);
@@ -562,23 +632,51 @@ export class Parser {
 
   // 'async'? 'function' '*'? Identifier '(' Params ')' Statement
   private FunctionDeclaration() {
-    let async = false;
-    let generator = false;
+    const functionInformation = this.FunctionInformation();
+
+    if (!functionInformation.internal.hasFunctionKeyword) {
+      throw new SyntaxError(`Expected function keyword`);
+    }
+
+    return {
+      ...functionInformation.value,
+      type: 'FunctionDeclaration',
+    };
+  }
+
+  // (OPT 'async') 'function' (OPT '*') (OPT (Id | '[' Id ']')) '(' PARAMS ')' BlockStatement
+  private FunctionInformation() {
+    const async = Boolean(this.expectOptional(TokenType.Async));
+
+    const hasFunctionKeyword = Boolean(this.expectOptional(TokenType.Function));
+
+    const generator = Boolean(this.expectOptional(TokenType.MultiplicativeOperator));
+
+    const id = this.lookahead === TokenType.OpenSquareBracket
+      ? this.ExpressionInsideSquareBrackets()
+      : this.lookahead.type === TokenType.Identifier
+        ? this.Identifier()
+        : null;
+
+    const params = this.FunctionParams();
+    const body = this.Statement();
+
+    return {
+      internal: {
+        hasFunctionKeyword,
+      },
+      value: {
+        async,
+        generator,
+        id,
+        params,
+        body,
+      }
+    };
+  }
+
+  FunctionParams() {
     const params = [];
-
-    if (this.lookahead.type === TokenType.Async) {
-      this.expect(TokenType.Async);
-      async = true;
-    }
-
-    this.expect(TokenType.Function);
-
-    if (this.lookahead.type === TokenType.MultiplicativeOperator) {
-      this.expect(TokenType.MultiplicativeOperator);
-      generator = true;
-    }
-
-    const id = this.Identifier();
 
     this.expect(TokenType.OpenParentheses);
 
@@ -592,16 +690,7 @@ export class Parser {
 
     this.expect(TokenType.CloseParentheses);
 
-    const body = this.Statement();
-
-    return {
-      type: 'FunctionDeclaration',
-      async,
-      generator,
-      id,
-      body,
-      params,
-    };
+    return params;
   }
 
   FunctionParam() {
@@ -629,15 +718,6 @@ export class Parser {
     };
   }
 
-  // UndefinedLiteral() {
-  //   this.expect(TokenType.Undefined);
-  //
-  //   return {
-  //     type: 'UndefinedLiteral',
-  //     value: undefined
-  //   };
-  // }
-
   // 'return' Expression
   private ReturnStatement() {
     this.expect(TokenType.Return);
@@ -649,14 +729,201 @@ export class Parser {
       argument,
     };
   }
+
+  private ClassDeclaration() {
+    return {
+      type: 'ClassDeclaration',
+      ...this.Class(),
+    };
+  }
+
+  private ClassExpression() {
+    return {
+      type: 'ClassExpression',
+      ...this.Class(),
+    };
+  }
+
+  private Class() {
+    this.expect(TokenType.Class);
+    const id = this.Identifier();
+    let superClass = null;
+
+    if (this.lookahead.type === TokenType.Extends) {
+      this.expect(TokenType.Extends);
+      superClass = this.Identifier();
+    }
+
+    const body = this.ClassBody();
+
+    return {
+      id,
+      superClass,
+      body,
+    };
+  }
+
+  private ClassBody() {
+    const body = [];
+
+    this.expect(TokenType.OpenBracket);
+
+    while (this.lookahead.type !== TokenType.CloseBracket) {
+      const isStatic = Boolean(this.expectOptional(TokenType.Static));
+
+      body.push({
+        ...this.ClassProperty(),
+        static: isStatic,
+      });
+    }
+
+    this.expect(TokenType.CloseBracket);
+
+    return {
+      type: 'ClassBody',
+      body,
+    };
+  }
+
+  private _Property({ methodDefinition, propertyDefinition, assignmentOperator }) {
+    if ([TokenType.Get, TokenType.Set, TokenType.Async].includes(this.lookahead.type)) {
+      return methodDefinition();
+    } else {
+      const left = this.ComputedProperty();
+
+      if (this.lookahead.type === assignmentOperator) {
+        return propertyDefinition(left);
+      } else {
+        return methodDefinition(left);
+      }
+    }
+  }
+
+  private ClassProperty() {
+    return this._Property({
+      methodDefinition: this.MethodDefinition.bind(this),
+      propertyDefinition: this.ClassPropertyDefinition.bind(this),
+      assignmentOperator: TokenType.SimpleAssignment,
+    });
+  }
+
+  private ObjectProperty() {
+    const property = this._Property({
+      methodDefinition: this.MethodDefinition.bind(this),
+      propertyDefinition: this.ObjectPropertyDefinition.bind(this),
+      assignmentOperator: TokenType.Colon,
+    });
+
+    return {
+      ...property,
+      type: 'ObjectProperty',
+      method: property.type !== 'PropertyDefinition',
+      shorthand: false, // TODO
+    };
+  }
+
+  // 'async'? ('get' | 'set') '*'? Identifier '(' Params ')' Statement
+  private MethodDefinition(id = { isComputed: false, value: null }) {
+    const isAsync = Boolean(this.expectOptional(TokenType.Async));
+
+    const kind = isAccessorOperator(this.lookahead.type)
+      ? this.expect(this.lookahead.type).value
+      : 'method';
+
+    const generator = Boolean(this.expectOptional(TokenType.MultiplicativeOperator));
+
+    if (!id.value) {
+      id = this.ComputedProperty();
+    }
+
+    const params = this.FunctionParams();
+    const body = this.Statement();
+
+    return {
+      type: 'MethodDefinition',
+      kind,
+      computed: id.isComputed,
+      key: id.value,
+      value: {
+        type: 'FunctionExpression',
+        id: null,
+        generator,
+        async: isAsync,
+        expression: false,
+        params,
+        body,
+      },
+    };
+  }
+
+  private ClassPropertyDefinition(left) {
+    this.expect(TokenType.SimpleAssignment);
+    const right = this.Expression();
+    this.expect(TokenType.Semicolon);
+
+    return {
+      type: 'PropertyDefinition',
+      computed: left.isComputed,
+      key: left.value,
+      value: right,
+    };
+  }
+
+  private ObjectPropertyDefinition(left) {
+    this.expect(TokenType.Colon);
+    const right = this.Expression();
+
+    return {
+      type: 'PropertyDefinition',
+      computed: left.isComputed,
+      key: left.value,
+      value: right,
+    };
+  }
+
+  private ThisExpression() {
+    this.expect(TokenType.This);
+
+    return {
+      type: 'ThisExpression'
+    };
+  }
+
+  private ObjectExpression() {
+    this.expect(TokenType.OpenBracket);
+
+    const properties = [];
+
+    while (this.lookahead.type !== TokenType.CloseBracket) {
+      properties.push(this.ObjectProperty());
+
+      if (this.lookahead.type !== TokenType.CloseBracket) {
+        this.expect(TokenType.Comma);
+      }
+    }
+
+    this.expect(TokenType.CloseBracket);
+
+    return {
+      type: 'ObjectExpression',
+      properties,
+    };
+  }
+
+  private FunctionExpression() {
+    return {
+      ...this.FunctionDeclaration(),
+      type: 'FunctionExpression',
+    }
+  }
 }
 
-// const program = `
-//    func(x = 3);
-// `;
-//
+const program = `
+  // comment
+`;
+
 // console.log({program})
-//
+
 // const parser = new Parser();
 //
 // console.log(JSON.stringify(parser.parse(program), null, 2));

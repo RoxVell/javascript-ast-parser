@@ -20,7 +20,7 @@ test(`false;`, {
       type: 'ExpressionStatement',
       expression: {
         type: 'BooleanLiteral',
-        value: true,
+        value: false,
       }
     }
   ]

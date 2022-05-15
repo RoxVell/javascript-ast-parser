@@ -18,6 +18,11 @@ const UNARY_OPERATORS: TokenType[] = [
   TokenType.Delete,
 ];
 
+const ACCESSOR_OPERATORS: TokenType[] = [
+  TokenType.Set,
+  TokenType.Get,
+];
+
 export function isLiteral(tokenType: TokenType): boolean {
   return [
     TokenType.Number,
@@ -41,6 +46,10 @@ export function isPrefixOperator(tokenType: TokenType): boolean {
 
 export function isUnaryOperator(tokenType: TokenType): boolean {
   return UNARY_OPERATORS.includes(tokenType);
+}
+
+export function isAccessorOperator(tokenType: TokenType): boolean {
+  return ACCESSOR_OPERATORS.includes(tokenType);
 }
 
 // export function isLogicalOperator(tokenType: TokenType) {

@@ -114,7 +114,7 @@ describe('IfStatement', () => {
             type: 'IfStatement',
             test: {
               type: 'BooleanLiteral',
-              value: true
+              value: false
             },
             consequent: {
               type: 'BlockStatement',

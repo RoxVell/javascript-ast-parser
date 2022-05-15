@@ -1,7 +1,7 @@
 import { test } from './variable-declaration.test';
 
 describe('CallExpression', () => {
-  it('single identifier call with no arguments', () => {
+  it('identifier call with no arguments', () => {
     test(`func();`, {
       type: "Program",
       body: [
@@ -14,6 +14,33 @@ describe('CallExpression', () => {
               name: 'func'
             },
             arguments: []
+          }
+        }
+      ]
+    });
+  });
+
+  it('member expression call', () => {
+    test(`console.log();`, {
+      type: "Program",
+      body: [
+        {
+          type: 'ExpressionStatement',
+          expression: {
+            type: 'CallExpression',
+            callee: {
+              type: 'MemberExpression',
+              object: {
+                type: 'Identifier',
+                name: 'console'
+              },
+              property: {
+                type: 'Identifier',
+                name: 'log'
+              },
+              computed: false,
+            },
+            arguments: [],
           }
         }
       ]

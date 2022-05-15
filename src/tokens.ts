@@ -2,6 +2,7 @@ export enum TokenType {
   Number = 'Number',
   String = 'String',
   Semicolon = 'Semicolon',
+  Colon = 'Colon',
   Boolean = 'Boolean',
   OpenBracket = 'OpenBracket',
   CloseBracket = 'CloseBracket',
@@ -25,7 +26,6 @@ export enum TokenType {
   EqualityOperator = 'EqualityOperator',
   RelationalOperator = 'RelationalOperator',
   Null = 'Null',
-  // Undefined = 'Undefined',
   LogicalOr = 'LogicalOr',
   LogicalAnd = 'LogicalAnd',
   Increment = 'Increment',
@@ -38,6 +38,13 @@ export enum TokenType {
   For = 'For',
   Return = 'Return',
   Dot = 'Dot',
+  Class = 'Class',
+  Extends = 'Extends',
+  Get = 'Get',
+  Set = 'Set',
+  Static = 'Static',
+  This = 'This',
+  QuestionMark = 'QuestionMark',
 }
 
 export const Tokens: { type: TokenType | null, pattern: RegExp }[] = [
@@ -56,7 +63,6 @@ export const Tokens: { type: TokenType | null, pattern: RegExp }[] = [
 
   // Null
   { type: TokenType.Null, pattern: /^null/ },
-  // { type: TokenType.Undefined, pattern: /^undefined/ },
 
   // Comparisons
   { type: TokenType.EqualityOperator, pattern: /^[=!]==?/ },
@@ -69,6 +75,17 @@ export const Tokens: { type: TokenType | null, pattern: RegExp }[] = [
   // Assignments
   { type: TokenType.SimpleAssignment, pattern: /^\=/ },
   { type: TokenType.ComplexAssignment, pattern: /^(\*|\/|\+|\-)\=/ },
+
+  { type: TokenType.Class, pattern: /^class/ },
+  { type: TokenType.Extends, pattern: /^extends/ },
+  { type: TokenType.Get, pattern: /^get/ },
+  { type: TokenType.Set, pattern: /^set/ },
+  { type: TokenType.Static, pattern: /^static/ },
+  { type: TokenType.This, pattern: /^this/ },
+
+  // Comments
+  { type: null, pattern: /^\/\/.*/ },
+  { type: null, pattern: /^\/\*[\S\s]*?\*\// },
 
   /**
    * Math operators
@@ -87,14 +104,12 @@ export const Tokens: { type: TokenType | null, pattern: RegExp }[] = [
   // Whitespaces
   { type: null, pattern: /^\s+/ },
 
-  // Comments
-  { type: null, pattern: /^\/\/.*/ },
-  { type: null, pattern: /^\/\*[\S\s]*\*\// },
-
   // Signs
   { type: TokenType.Semicolon, pattern: /^;/ },
+  { type: TokenType.Colon, pattern: /^:/ },
   { type: TokenType.Comma, pattern: /^,/ },
   { type: TokenType.Dot, pattern: /^\./ },
+  { type: TokenType.QuestionMark, pattern: /^\?/ },
 
   // Brackets
   { type: TokenType.OpenBracket, pattern: /^\{/ },
