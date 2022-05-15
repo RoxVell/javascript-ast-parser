@@ -48,6 +48,7 @@ export enum TokenType {
   QuestionMark = 'QuestionMark',
   New = 'New',
   OptionalDot = 'OptionalDot',
+  Exponentiation = 'Exponentiation',
 }
 
 export const Tokens: { type: TokenType | null, pattern: RegExp }[] = [
@@ -102,6 +103,7 @@ export const Tokens: { type: TokenType | null, pattern: RegExp }[] = [
   { type: TokenType.Await, pattern: /^await/ },
   { type: TokenType.Delete, pattern: /^delete/ },
 
+  { type: TokenType.Exponentiation, pattern: /^\*\*/ },
   { type: TokenType.AdditiveOperator, pattern: /^(\+|\-)/ },
   { type: TokenType.MultiplicativeOperator, pattern: /^(\*|\/)/ },
 
@@ -113,8 +115,8 @@ export const Tokens: { type: TokenType | null, pattern: RegExp }[] = [
   { type: TokenType.Colon, pattern: /^:/ },
   { type: TokenType.Comma, pattern: /^,/ },
   { type: TokenType.Dot, pattern: /^\./ },
+  { type: TokenType.OptionalOpenSquareBracket, pattern: /^\?\.\[/ },
   { type: TokenType.OptionalDot, pattern: /^\?\./ },
-  { type: TokenType.OptionalOpenSquareBracket, pattern: /^\?\[/ },
   { type: TokenType.QuestionMark, pattern: /^\?/ },
 
   // Brackets

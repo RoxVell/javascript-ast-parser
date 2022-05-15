@@ -150,8 +150,15 @@ export class Parser {
 
   MultiplicativeExpression() {
     return this.BinaryExpression(
-      'PrefixExpression',
+      'ExponentialExpression',
       TokenType.MultiplicativeOperator
+    );
+  }
+
+  ExponentialExpression() {
+    return this.BinaryExpression(
+      'PrefixExpression',
+      TokenType.Exponentiation
     );
   }
 
@@ -305,44 +312,52 @@ export class Parser {
     return params;
   }
 
+  /**
+   * Expression '?.' | '.' Identifier
+   * Expression '?.[' | '[' Expression
+   */
   MemberExpression() {
     let left = this.Literal();
 
-    while (this.lookahead.type === TokenType.Dot || this.lookahead.type === TokenType.OptionalDot) {
-      const optional = Boolean(this.expectOptional(TokenType.OptionalDot));
+    // TODO: refactor
+    while (
+      this.lookahead.type === TokenType.Dot || this.lookahead.type === TokenType.OptionalDot
+      || this.lookahead.type === TokenType.OpenSquareBracket || this.lookahead.type === TokenType.OptionalOpenSquareBracket
+      ) {
+      if (this.lookahead.type === TokenType.Dot || this.lookahead.type === TokenType.OptionalDot) {
+        const optional = Boolean(this.expectOptional(TokenType.OptionalDot));
 
-      if (!optional) {
-        this.expect(TokenType.Dot);
+        if (!optional) {
+          this.expect(TokenType.Dot);
+        }
+
+        left = {
+          type: 'MemberExpression',
+          // @ts-ignore
+          computed: false,
+          object: left,
+          optional,
+          property: this.Identifier(),
+        };
+      } else {
+        const optional = Boolean(this.expectOptional(TokenType.OptionalOpenSquareBracket));
+
+        if (!optional) {
+          this.expect(TokenType.OpenSquareBracket);
+        }
+
+        const expression = this.Expression();
+        this.expect(TokenType.CloseSquareBracket);
+
+        left = {
+          type: 'MemberExpression',
+          // @ts-ignore
+          computed: true,
+          object: left,
+          property: expression,
+          optional,
+        };
       }
-
-      left = {
-        type: 'MemberExpression',
-        // @ts-ignore
-        computed: false,
-        object: left,
-        optional,
-        property: this.Identifier(),
-      };
-    }
-
-    while (this.lookahead.type === TokenType.OpenSquareBracket || this.lookahead.type === TokenType.OptionalOpenSquareBracket) {
-      const optional = Boolean(this.expectOptional(TokenType.OptionalOpenSquareBracket));
-
-      if (!optional) {
-        this.expect(TokenType.OpenSquareBracket);
-      }
-
-      const expression = this.Expression();
-      this.expect(TokenType.CloseSquareBracket);
-
-      left = {
-        type: 'MemberExpression',
-        // @ts-ignore
-        computed: true,
-        object: left,
-        property: expression,
-        optional,
-      };
     }
 
     return left;
@@ -947,7 +962,7 @@ export class Parser {
 }
 
 const program = `
-  new A;
+  a?.[b];
 `;
 
 // console.log({program})
