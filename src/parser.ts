@@ -156,9 +156,17 @@ export class Parser {
 
   MultiplicativeExpression() {
     return this.BinaryExpression(
-      'ExponentialExpression',
+      'RemainderExpression',
       TokenType.MultiplicativeOperator
     );
+  }
+
+  // Expression '%' Expression
+  RemainderExpression() {
+    return this.BinaryExpression(
+      'ExponentialExpression',
+      TokenType.RemainderOperator,
+    )
   }
 
   ExponentialExpression() {

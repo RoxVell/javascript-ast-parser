@@ -49,6 +49,7 @@ export enum TokenType {
   New = 'New',
   OptionalDot = 'OptionalDot',
   Exponentiation = 'Exponentiation',
+  RemainderOperator = 'RemainderOperator',
 }
 
 export const Tokens: { type: TokenType | null, pattern: RegExp }[] = [
@@ -106,6 +107,7 @@ export const Tokens: { type: TokenType | null, pattern: RegExp }[] = [
   { type: TokenType.Exponentiation, pattern: /^\*\*/ },
   { type: TokenType.AdditiveOperator, pattern: /^(\+|\-)/ },
   { type: TokenType.MultiplicativeOperator, pattern: /^(\*|\/)/ },
+  { type: TokenType.RemainderOperator, pattern: /^%/ },
 
   // Whitespaces
   { type: null, pattern: /^\s+/ },
