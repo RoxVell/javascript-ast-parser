@@ -38,6 +38,7 @@ describe('CallExpression', () => {
                 type: 'Identifier',
                 name: 'log'
               },
+              optional: false,
               computed: false,
             },
             arguments: [],

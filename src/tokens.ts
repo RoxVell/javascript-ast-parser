@@ -11,6 +11,7 @@ export enum TokenType {
   OpenParentheses = 'OpenParentheses',
   CloseParentheses = 'CloseParentheses',
   OpenSquareBracket = 'OpenSquareBracket',
+  OptionalOpenSquareBracket = 'OptionalOpenSquareBracket',
   CloseSquareBracket = 'CloseSquareBracket',
   Comma = 'Comma',
   SimpleAssignment = 'SimpleAssignment',
@@ -45,6 +46,8 @@ export enum TokenType {
   Static = 'Static',
   This = 'This',
   QuestionMark = 'QuestionMark',
+  New = 'New',
+  OptionalDot = 'OptionalDot',
 }
 
 export const Tokens: { type: TokenType | null, pattern: RegExp }[] = [
@@ -77,6 +80,7 @@ export const Tokens: { type: TokenType | null, pattern: RegExp }[] = [
   { type: TokenType.ComplexAssignment, pattern: /^(\*|\/|\+|\-)\=/ },
 
   { type: TokenType.Class, pattern: /^class/ },
+  { type: TokenType.New, pattern: /^new/ },
   { type: TokenType.Extends, pattern: /^extends/ },
   { type: TokenType.Get, pattern: /^get/ },
   { type: TokenType.Set, pattern: /^set/ },
@@ -109,6 +113,8 @@ export const Tokens: { type: TokenType | null, pattern: RegExp }[] = [
   { type: TokenType.Colon, pattern: /^:/ },
   { type: TokenType.Comma, pattern: /^,/ },
   { type: TokenType.Dot, pattern: /^\./ },
+  { type: TokenType.OptionalDot, pattern: /^\?\./ },
+  { type: TokenType.OptionalOpenSquareBracket, pattern: /^\?\[/ },
   { type: TokenType.QuestionMark, pattern: /^\?/ },
 
   // Brackets

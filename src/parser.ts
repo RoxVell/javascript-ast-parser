@@ -265,6 +265,8 @@ export class Parser {
         return this.ObjectExpression();
       case TokenType.Function:
         return this.FunctionExpression();
+      case TokenType.New:
+        return this.NewExpression();
       default:
         return this.CallExpression();
     }
@@ -306,29 +308,40 @@ export class Parser {
   MemberExpression() {
     let left = this.Literal();
 
-    while (this.lookahead.type === TokenType.Dot) {
-      this.expect(TokenType.Dot);
+    while (this.lookahead.type === TokenType.Dot || this.lookahead.type === TokenType.OptionalDot) {
+      const optional = Boolean(this.expectOptional(TokenType.OptionalDot));
+
+      if (!optional) {
+        this.expect(TokenType.Dot);
+      }
 
       left = {
         type: 'MemberExpression',
         // @ts-ignore
+        computed: false,
         object: left,
+        optional,
         property: this.Identifier(),
-        computed: false
-      }
+      };
     }
 
-    while (this.lookahead.type === TokenType.OpenSquareBracket) {
-      this.expect(TokenType.OpenSquareBracket);
+    while (this.lookahead.type === TokenType.OpenSquareBracket || this.lookahead.type === TokenType.OptionalOpenSquareBracket) {
+      const optional = Boolean(this.expectOptional(TokenType.OptionalOpenSquareBracket));
+
+      if (!optional) {
+        this.expect(TokenType.OpenSquareBracket);
+      }
+
       const expression = this.Expression();
       this.expect(TokenType.CloseSquareBracket);
 
       left = {
         type: 'MemberExpression',
         // @ts-ignore
+        computed: true,
         object: left,
         property: expression,
-        computed: true
+        optional,
       };
     }
 
@@ -916,14 +929,29 @@ export class Parser {
       type: 'FunctionExpression',
     }
   }
+
+  // 'new' MemberExpression
+  private NewExpression() {
+    this.expect(TokenType.New);
+
+    const callExpression = this.CallExpression();
+
+    return {
+      type: 'NewExpression',
+      // @ts-ignore
+      callee: callExpression.callee || callExpression,
+      // @ts-ignore
+      arguments: callExpression.arguments || [],
+    };
+  }
 }
 
 const program = `
-  // comment
+  new A;
 `;
 
 // console.log({program})
-
+//
 // const parser = new Parser();
 //
 // console.log(JSON.stringify(parser.parse(program), null, 2));
