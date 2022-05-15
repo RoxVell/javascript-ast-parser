@@ -1,6 +1,12 @@
 import { Tokenizer } from './tokenizer';
 import { TokenType } from './tokens';
-import { isAccessorOperator, isAssignmentOperator, isPrefixOperator, isUnaryOperator } from './tokens-utils';
+import {
+  isAccessorOperator,
+  isAssignmentOperator,
+  isPostfixOperator,
+  isPrefixOperator,
+  isUnaryOperator
+} from './tokens-utils';
 
 export class Parser {
   private tokenizer = new Tokenizer();
@@ -176,7 +182,17 @@ export class Parser {
       }
     }
 
-    return this.PrimaryExpression();
+    return this.PostfixExpression();
+  }
+
+  private PostfixExpression() {
+    const left = this.PrimaryExpression();
+
+    if (isPostfixOperator(this.lookahead.type)) {
+      return this.PostfixIncrementExpression(left);
+    }
+
+    return left;
   }
 
   AwaitExpression() {
@@ -205,6 +221,25 @@ export class Parser {
     }
 
     throw new Error(`Unexpected prefix operator, got: ${this.lookahead.type}`);
+  }
+
+  PostfixOperator() {
+    if (isPostfixOperator(this.lookahead.type)) {
+      return this.expect(this.lookahead.type);
+    }
+
+    throw new Error(`Unexpected prefix operator, got: ${this.lookahead.type}`);
+  }
+
+  PostfixIncrementExpression(argument) {
+    this.checkIncrementTarget(argument);
+    const operator = this.PostfixOperator().value;
+
+    return this.UpdateExpression({
+      operator,
+      prefix: false,
+      argument: argument,
+    });
   }
 
   PrefixIncrementExpression() {
@@ -962,9 +997,9 @@ export class Parser {
 }
 
 const program = `
-  a?.[b];
+  ++x++;
 `;
-
+//
 // console.log({program})
 //
 // const parser = new Parser();

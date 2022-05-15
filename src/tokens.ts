@@ -95,8 +95,8 @@ export const Tokens: { type: TokenType | null, pattern: RegExp }[] = [
   /**
    * Math operators
    */
-  // Prefix
   { type: TokenType.Increment, pattern: /^((\+\+)|(\-\-))/ },
+  // Prefix
   { type: TokenType.Exclamation, pattern: /^!/ },
   { type: TokenType.Void, pattern: /^void/ },
   { type: TokenType.Typeof, pattern: /^typeof/ },
