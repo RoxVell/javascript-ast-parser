@@ -235,21 +235,21 @@
       <td><a href="/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_AND">Bitwise AND (&amp;)</a></td>
       <td>left-to-right</td>
       <td><code>… &amp; …</code></td>
-      <td>❌</td>
+      <td>✅</td>
     </tr>
     <tr>
       <td>7</td>
       <td><a href="/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_XOR">Bitwise XOR (^)</a></td>
       <td>left-to-right</td>
       <td><code>… ^ …</code></td>
-      <td>❌</td>
+      <td>✅</td>
     </tr>
     <tr>
       <td>6</td>
       <td><a href="/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_OR">Bitwise OR (|)</a></td>
       <td>left-to-right</td>
       <td><code>… | …</code></td>
-      <td>❌</td>
+      <td>✅</td>
     </tr>
     <tr>
       <td>5</td>
