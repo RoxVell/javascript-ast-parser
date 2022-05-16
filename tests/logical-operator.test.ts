@@ -91,6 +91,60 @@ describe('Logical operators', () => {
           }
         }
       ]
-    })
+    });
   });
-})
+
+  it('nullish coalescing', () => {
+    test(`null ?? true;`, {
+      type: 'Program',
+      body: [
+        {
+          type: 'ExpressionStatement',
+          expression: {
+            type: 'LogicalExpression',
+            operator: '??',
+            left: {
+              type: 'NullLiteral',
+              value: null,
+            },
+            right: {
+              type: 'BooleanLiteral',
+              value: true,
+            }
+          }
+        }
+      ]
+    });
+  });
+
+  it('chained nullish coalescing', () => {
+    test(`null ?? true ?? false;`, {
+      type: 'Program',
+      body: [
+        {
+          type: 'ExpressionStatement',
+          expression: {
+            type: 'LogicalExpression',
+            operator: '??',
+            left: {
+              type: 'LogicalExpression',
+              operator: '??',
+              left: {
+                type: 'NullLiteral',
+                value: null,
+              },
+              right: {
+                type: 'BooleanLiteral',
+                value: true,
+              }
+            },
+            right: {
+              type: 'BooleanLiteral',
+              value: false,
+            }
+          }
+        }
+      ]
+    });
+  });
+});

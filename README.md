@@ -269,7 +269,7 @@
       <td><a href="/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing_operator">Nullish coalescing operator (??)</a></td>
       <td>left-to-right</td>
       <td><code>… ?? …</code></td>
-      <td>❌</td>
+      <td>✅</td>
     </tr>
     <tr>
       <td>3</td>

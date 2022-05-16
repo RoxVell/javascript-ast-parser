@@ -50,6 +50,7 @@ export enum TokenType {
   OptionalDot = 'OptionalDot',
   Exponentiation = 'Exponentiation',
   RemainderOperator = 'RemainderOperator',
+  NullishCoalescing = 'NullishCoalescing',
 }
 
 export const Tokens: { type: TokenType | null, pattern: RegExp }[] = [
@@ -84,6 +85,7 @@ export const Tokens: { type: TokenType | null, pattern: RegExp }[] = [
   // Logical operators
   { type: TokenType.LogicalOr, pattern: /^\|\|/ },
   { type: TokenType.LogicalAnd, pattern: /^&&/ },
+  { type: TokenType.NullishCoalescing, pattern: /^\?\?/ },
 
   { type: TokenType.Class, pattern: /^class/ },
   { type: TokenType.New, pattern: /^new/ },

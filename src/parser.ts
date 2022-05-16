@@ -98,7 +98,7 @@ export class Parser {
 
   // Expression '?' Expression ':' Expression
   ConditionalExpression() {
-    const left = this.LogicalOrExpression();
+    const left = this.NullishCoalescingOrLogicalOrExpression();
 
     if (this.lookahead.type === TokenType.QuestionMark) {
       this.expect(TokenType.QuestionMark);
@@ -117,12 +117,24 @@ export class Parser {
     return left;
   }
 
-  LogicalOrExpression() {
+  NullishCoalescingOrLogicalOrExpression() {
     return this.BinaryExpression(
       'LogicalAndExpression',
-      TokenType.LogicalOr,
+      [TokenType.LogicalOr, TokenType.NullishCoalescing],
       'LogicalExpression',
     );
+  }
+
+  expectOneOf(tokenTypes: TokenType[]) {
+    for (const tokenType of tokenTypes) {
+      const token = this.expectOptional(tokenType);
+
+      if (Boolean(token)) {
+        return token;
+      }
+    }
+
+    throw new Error(`Expected one of ${tokenTypes.join(', ')} tokens, but got: ${this.lookahead.type}`);
   }
 
   LogicalAndExpression() {
@@ -285,11 +297,13 @@ export class Parser {
     return token;
   }
 
-  BinaryExpression(methodName: string, tokenType: TokenType, type?: string) {
+  BinaryExpression(methodName: string, tokenType: TokenType | TokenType[], type?: string) {
     let left: any = this[methodName]();
 
-    while (this.lookahead.type === tokenType) {
-      const operator = this.expect(tokenType).value;
+    const tokensToCheck = Array.isArray(tokenType) ? tokenType : [tokenType];
+
+    while (tokensToCheck.includes(this.lookahead.type)) {
+      const operator = this.expectOneOf(tokensToCheck).value;
 
       const right = this[methodName]();
 
@@ -300,7 +314,6 @@ export class Parser {
         right,
       };
     }
-
 
     return left;
   }
@@ -1005,11 +1018,11 @@ export class Parser {
 }
 
 const program = `
-  2 + 2 === 4 ? 'Right' : 'Wrong';;
+  5 ?? true || false;
 `;
-
-console.log({program})
-
+//
+// console.log({program})
+//
 // const parser = new Parser();
 //
 // console.log(JSON.stringify(parser.parse(program), null, 2));
