@@ -1005,11 +1005,11 @@ export class Parser {
 }
 
 const program = `
-  ++x++;
+  2 + 2 === 4 ? 'Right' : 'Wrong';;
 `;
-//
-// console.log({program})
-//
+
+console.log({program})
+
 // const parser = new Parser();
 //
 // console.log(JSON.stringify(parser.parse(program), null, 2));

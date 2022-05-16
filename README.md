@@ -295,7 +295,7 @@
     </tr>
     <tr>
       <td><code>… **= …</code></td>
-      <td>❌</td>
+      <td>✅</td>
     </tr>
     <tr>
       <td><code>… *= …</code></td>
@@ -307,43 +307,43 @@
     </tr>
     <tr>
       <td><code>… %= …</code></td>
-      <td>❌</td>
+      <td>✅</td>
     </tr>
     <tr>
       <td><code>… &lt;&lt;= …</code></td>
-      <td>❌</td>
+      <td>✅</td>
     </tr>
     <tr>
       <td><code>… &gt;&gt;= …</code></td>
-      <td>❌</td>
+      <td>✅</td>
     </tr>
     <tr>
       <td><code>… &gt;&gt;&gt;= …</code></td>
-      <td>❌</td>
+      <td>✅</td>
     </tr>
     <tr>
       <td><code>… &amp;= …</code></td>
-      <td>❌</td>
+      <td>✅</td>
     </tr>
     <tr>
       <td><code>… ^= …</code></td>
-      <td>❌</td>
+      <td>✅</td>
     </tr>
     <tr>
       <td><code>… |= …</code></td>
-      <td>❌</td>
+      <td>✅</td>
     </tr>
     <tr>
       <td><code>… &amp;&amp;= …</code></td>
-      <td>❌</td>
+      <td>✅</td>
     </tr>
     <tr>
       <td><code>… ||= …</code></td>
-      <td>❌</td>
+      <td>✅</td>
     </tr>
     <tr>
       <td><code>… ??= …</code></td>
-      <td>❌</td>
+      <td>✅</td>
     </tr>
     <tr>
       <td><a href="/en-US/docs/Web/JavaScript/Reference/Operators/yield"><code>yield</code></a></td>

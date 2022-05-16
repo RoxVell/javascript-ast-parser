@@ -71,15 +71,19 @@ export const Tokens: { type: TokenType | null, pattern: RegExp }[] = [
 
   // Comparisons
   { type: TokenType.EqualityOperator, pattern: /^[=!]==?/ },
-  { type: TokenType.RelationalOperator, pattern: /^(\>|\<)\=?/ },
+
+  // Assignment (+= -= *= /= **= %= <<= >>= >>>= &= ^= |= &&= ||= ??=)
+  { type: TokenType.ComplexAssignment, pattern: /^(\*|\/|\+|-|%|<<|>>|>>>|&|&&|\^|\||\|\||\?\?|\*\*)=/ },
+
+  // Comparisons
+  { type: TokenType.RelationalOperator, pattern: /^(>|<)=?/ },
+
+  // Assignment
+  { type: TokenType.SimpleAssignment, pattern: /^\=/ },
 
   // Logical operators
   { type: TokenType.LogicalOr, pattern: /^\|\|/ },
   { type: TokenType.LogicalAnd, pattern: /^&&/ },
-
-  // Assignments
-  { type: TokenType.SimpleAssignment, pattern: /^\=/ },
-  { type: TokenType.ComplexAssignment, pattern: /^(\*|\/|\+|\-)\=/ },
 
   { type: TokenType.Class, pattern: /^class/ },
   { type: TokenType.New, pattern: /^new/ },
