@@ -1,27 +1,8 @@
-import { test } from './variable-declaration.test';
+import { test, testSingleBinaryExpression } from '../src/tests.utils';
 
 describe('Exponentiation', () => {
   it('single exponentiation', () => {
-    test(`5 ** 2;`,  {
-      type: 'Program',
-      body: [
-        {
-          type: 'ExpressionStatement',
-          expression: {
-            type: 'BinaryExpression',
-            operator: '**',
-            left: {
-              type: 'NumberLiteral',
-              value: 5,
-            },
-            right: {
-              type: 'NumberLiteral',
-              value: 2,
-            },
-          }
-        }
-      ]
-    });
+    testSingleBinaryExpression('**');
   });
 
   it('multiple exponentiation', () => {

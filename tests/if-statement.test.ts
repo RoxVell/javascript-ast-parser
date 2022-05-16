@@ -1,4 +1,4 @@
-import { test } from './variable-declaration.test';
+import { test } from '../src/tests.utils';
 
 describe('IfStatement', () => {
   it('if statement with empty block statement', () => {

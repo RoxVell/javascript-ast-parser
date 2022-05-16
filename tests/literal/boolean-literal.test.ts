@@ -1,27 +1,33 @@
-import { test } from '../variable-declaration.test';
+import { test } from '../../src/tests.utils';
 
-test(`true;`, {
-  type: 'Program',
-  body: [
-    {
-      type: 'ExpressionStatement',
-      expression: {
-        type: 'BooleanLiteral',
-        value: true,
-      }
-    }
-  ]
-});
+describe('Boolean literal', () => {
+  it('true literal', () => {
+    test(`true;`, {
+      type: 'Program',
+      body: [
+        {
+          type: 'ExpressionStatement',
+          expression: {
+            type: 'BooleanLiteral',
+            value: true,
+          }
+        }
+      ]
+    });
+  });
 
-test(`false;`, {
-  type: 'Program',
-  body: [
-    {
-      type: 'ExpressionStatement',
-      expression: {
-        type: 'BooleanLiteral',
-        value: false,
-      }
-    }
-  ]
+  it('false literal', () => {
+    test(`false;`, {
+      type: 'Program',
+      body: [
+        {
+          type: 'ExpressionStatement',
+          expression: {
+            type: 'BooleanLiteral',
+            value: false,
+          }
+        }
+      ]
+    });
+  });
 });

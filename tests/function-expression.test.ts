@@ -1,4 +1,4 @@
-import { test } from './variable-declaration.test';
+import { test } from '../src/tests.utils';
 
 describe('Function expression', () => {
   it('simple function expression', () => {

@@ -139,8 +139,32 @@ export class Parser {
 
   LogicalAndExpression() {
     return this.BinaryExpression(
-      'EqualityExpression',
+      'BitwiseOrExpression',
       TokenType.LogicalAnd,
+      'LogicalExpression',
+    );
+  }
+
+  BitwiseOrExpression() {
+    return this.BinaryExpression(
+      'BitwiseXorExpression',
+      TokenType.BitwiseOr,
+      'LogicalExpression',
+    );
+  }
+
+  BitwiseXorExpression() {
+    return this.BinaryExpression(
+      'BitwiseAndExpression',
+      TokenType.BitwiseXor,
+      'LogicalExpression',
+    );
+  }
+
+  BitwiseAndExpression() {
+    return this.BinaryExpression(
+      'EqualityExpression',
+      TokenType.BitwiseAnd,
       'LogicalExpression',
     );
   }
@@ -1018,7 +1042,7 @@ export class Parser {
 }
 
 const program = `
-  5 ?? true || false;
+  0 | 1;
 `;
 //
 // console.log({program})
@@ -1027,7 +1051,7 @@ const program = `
 //
 // console.log(JSON.stringify(parser.parse(program), null, 2));
 
-
+//
 // function getAllTokens(tokenizer: Tokenizer) {
 //   let token = tokenizer.getNextToken();
 //

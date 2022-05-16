@@ -1,4 +1,4 @@
-import { test } from './variable-declaration.test';
+import { test } from '../src/tests.utils';
 
 describe('Conditional expression', () => {
   it('simple conditional expression', () => {

@@ -51,6 +51,9 @@ export enum TokenType {
   Exponentiation = 'Exponentiation',
   RemainderOperator = 'RemainderOperator',
   NullishCoalescing = 'NullishCoalescing',
+  BitwiseAnd = 'BitwiseAnd',
+  BitwiseXor = 'BitwiseXor',
+  BitwiseOr = 'BitwiseOr',
 }
 
 export const Tokens: { type: TokenType | null, pattern: RegExp }[] = [
@@ -87,6 +90,11 @@ export const Tokens: { type: TokenType | null, pattern: RegExp }[] = [
   { type: TokenType.LogicalAnd, pattern: /^&&/ },
   { type: TokenType.NullishCoalescing, pattern: /^\?\?/ },
 
+  // Bitwise operator
+  { type: TokenType.BitwiseAnd, pattern: /^&/ },
+  { type: TokenType.BitwiseXor, pattern: /^\^/ },
+  { type: TokenType.BitwiseOr, pattern: /^\|/ },
+
   { type: TokenType.Class, pattern: /^class/ },
   { type: TokenType.New, pattern: /^new/ },
   { type: TokenType.Extends, pattern: /^extends/ },
@@ -102,7 +110,7 @@ export const Tokens: { type: TokenType | null, pattern: RegExp }[] = [
   /**
    * Math operators
    */
-  { type: TokenType.Increment, pattern: /^((\+\+)|(\-\-))/ },
+  { type: TokenType.Increment, pattern: /^((\+\+)|(--))/ },
   // Prefix
   { type: TokenType.Exclamation, pattern: /^!/ },
   { type: TokenType.Void, pattern: /^void/ },

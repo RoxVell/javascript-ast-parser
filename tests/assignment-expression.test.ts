@@ -1,4 +1,4 @@
-import { test } from './variable-declaration.test';
+import { test } from '../src/tests.utils';
 
 function testAssignmentExpression(operator: string) {
   it(operator, () => {

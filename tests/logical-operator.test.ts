@@ -1,50 +1,12 @@
-import { test } from './variable-declaration.test';
+import { test, testSingleBinaryExpression } from '../src/tests.utils';
 
 describe('Logical operators', () => {
   it('simple && operator', () => {
-    test(`a && b;`, {
-      type: 'Program',
-      body: [
-        {
-          type: 'ExpressionStatement',
-          expression: {
-            type: 'LogicalExpression',
-            operator: '&&',
-            left: {
-              type: 'Identifier',
-              name: 'a'
-            },
-            right: {
-              type: 'Identifier',
-              name: 'b'
-            },
-          }
-        }
-      ]
-    });
+    testSingleBinaryExpression('&&', 'LogicalExpression');
   });
 
   it('simple || operator', () => {
-    test(`a || b;`, {
-      type: 'Program',
-      body: [
-        {
-          type: 'ExpressionStatement',
-          expression: {
-            type: 'LogicalExpression',
-            operator: '||',
-            left: {
-              type: 'Identifier',
-              name: 'a'
-            },
-            right: {
-              type: 'Identifier',
-              name: 'b'
-            },
-          }
-        }
-      ]
-    });
+    testSingleBinaryExpression('||', 'LogicalExpression');
   });
 
   it('logical operator inside complex expression', () => {
@@ -95,26 +57,7 @@ describe('Logical operators', () => {
   });
 
   it('nullish coalescing', () => {
-    test(`null ?? true;`, {
-      type: 'Program',
-      body: [
-        {
-          type: 'ExpressionStatement',
-          expression: {
-            type: 'LogicalExpression',
-            operator: '??',
-            left: {
-              type: 'NullLiteral',
-              value: null,
-            },
-            right: {
-              type: 'BooleanLiteral',
-              value: true,
-            }
-          }
-        }
-      ]
-    });
+    testSingleBinaryExpression('??', 'LogicalExpression');
   });
 
   it('chained nullish coalescing', () => {

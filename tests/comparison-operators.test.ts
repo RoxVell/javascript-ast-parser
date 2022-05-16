@@ -1,50 +1,16 @@
-import { test } from './variable-declaration.test';
+import { test, testSingleBinaryExpression } from '../src/tests.utils';
 
 describe('Comparison operators', () => {
   it('simple equality comparison', () => {
-    test(`5 === 5;`, {
-      type: 'Program',
-      body: [
-        {
-          type: 'ExpressionStatement',
-          expression: {
-            type: 'BinaryExpression',
-            operator: '===',
-            left: {
-              type: 'NumberLiteral',
-              value: 5
-            },
-            right: {
-              type: 'NumberLiteral',
-              value: 5
-            },
-          }
-        }
-      ]
-    })
+    testSingleBinaryExpression('===');
   });
 
   it('simple greater than comparison', () => {
-    test(`5 >= 5;`, {
-      type: 'Program',
-      body: [
-        {
-          type: 'ExpressionStatement',
-          expression: {
-            type: 'BinaryExpression',
-            operator: '>=',
-            left: {
-              type: 'NumberLiteral',
-              value: 5
-            },
-            right: {
-              type: 'NumberLiteral',
-              value: 5
-            },
-          }
-        }
-      ]
-    })
+    testSingleBinaryExpression('>=');
+  });
+
+  it('negative equality', () => {
+    testSingleBinaryExpression('!==');
   });
 
   it('correct order with equality operator and relational', () => {
@@ -83,29 +49,6 @@ describe('Comparison operators', () => {
           }
         }
       ],
-    })
+    });
   });
-
-  it('negative equality', () => {
-    test(`5 !== null;`, {
-      type: 'Program',
-      body: [
-        {
-          type: 'ExpressionStatement',
-          expression: {
-            type: 'BinaryExpression',
-            operator: '!==',
-            left: {
-              type: "NumberLiteral",
-              value: 5,
-            },
-            right: {
-              type: 'NullLiteral',
-              value: null
-            }
-          }
-        }
-      ]
-    })
-  })
 });

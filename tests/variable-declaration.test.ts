@@ -1,10 +1,4 @@
-import { Parser } from '../src/parser';
-
-export function test(program: string, expectedResult) {
-  const parser = new Parser();
-  const ast = parser.parse(program);
-  return expect(ast).toStrictEqual(expectedResult);
-}
+import { test } from '../src/tests.utils';
 
 describe('Variable declaration', () => {
   it('single let variable declaration', () => {
